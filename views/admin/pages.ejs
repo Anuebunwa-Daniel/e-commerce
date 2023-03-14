@@ -1,0 +1,74 @@
+<%- include('../_layouts/adminheader') %>
+
+    <h2 class="page-title">Pages</h2>
+    <a href="/admin/pages/add_page" class="btn btn-primary">Add a new page</a>
+    <br><br>
+
+    <table class="table table-striped sorting">
+        <thead>
+            <tr class="home">
+                <th>Title</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% pages.forEach((page)=>{ %>
+                <tr id ="id_<%= page._id%> " class="<%= page.slug%>">
+                    <td>
+                        <%= page.title %>
+                    </td>
+                    <td><a href="/admin/pages/edit-page/<%= page._id %> ">Edit</a></td>
+                    <% if (page.slug=="home" ) {%>
+                        <td></td>
+                    <%} else{%>
+                    <td><a class="confirmDeletion" href="/admin/pages/delete-page/<%= page._id %> ">Delete</a></td>
+                    <% } %>
+
+                </tr>
+                <% }) %>
+
+        </tbody>
+    </table>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!-- <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script> -->
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script> -->
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/jquery-sortablejs@latest/jquery-sortable.js"></script> -->
+
+
+<script>
+
+$('tbody').sortable({
+   items: "tr:not('.home')", 
+   placeholder: "ui-state-hightlight",
+   update: function () {
+    var ids = $('tbody').sortable("serielize")
+
+    var url = "/admin/pages/reorder-pages";
+    $.post(url, ids)
+   }
+   
+})
+
+</script>
+
+
+<!-- <script>
+    const tbody = document.querySelector('tbody');
+
+tbody.addEventListener('sortupdate', function(event) {
+  const ids = event.detail.serialized;
+  const url = '/admin/pages/reorder-page';
+
+  
+  fetch(url, {
+      method: 'POST',
+      body: ids
+    });
+    console.log(ids)
+});
+</script> -->
+
+    <%- include('../_layouts/adminfooter') %>

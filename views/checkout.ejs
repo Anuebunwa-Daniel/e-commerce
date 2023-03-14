@@ -1,0 +1,118 @@
+<%- include ('_layouts/header') %>
+
+    <% if (typeof cart !=="undefined" ){ %>
+        <h1 class="text-title">My cart</h1>
+        <br><br>
+        <table class="table table-striped alignmiddle">
+            <tr>
+                <th>image</th>
+                <th>Title</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th></th>
+                <th>Subtotal</th>
+            </tr>
+
+            <% var total=0 %>
+                <% cart.forEach((product)=>{ %>
+                    <% var sub=parseFloat(product.qty * product.price).toFixed(2) %>
+                        <% total +=+sub %>
+
+                            <tr>
+                                <td><img class="cpi" src="<%= product.image %>" alt=""></td>
+                                <td>
+                                    <%= product.title %>
+                                </td>
+                                <td>$<%= product.price %>
+                                </td>
+                                <td>
+                                    <%= product.qty %>
+                                </td>
+                                <td>
+                                    <a href="/cart/update/<%= product.title %>?action=add">+</a>
+                                    <a href="/cart/update/<%= product.title %>?action=remove">-</a>
+                                    <a href="/cart/update/<%= product.title %>?action=clear">Clear</a>
+                                </td>
+                                <td>$<%= sub %>
+                                </td>
+                            </tr>
+
+                            <% }) %>
+
+                                <tr>
+                                    <td colspan="6" align="right"><b>$<%= parseFloat (total).toFixed(2) %></b></td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan="5" align="right">
+                                        <a class="btn btn-danger clearCart" href="/cart/clear">Clear cart</a>
+                                    </td>
+
+                                    <td colspan="5" align="right">
+                                        <a class="btn btn-primary buynow" id="buynow" href="/cart/buy">Buy Now</a>
+                                    </td>
+
+                                </tr>
+        </table>
+
+        <form class="pp" action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" id="">
+            <input type="hidden" name="cmd" value="_cart">
+            <input type="hidden" name="upload" value="1">
+            <input type="hidden" name="business" value="sb-t47rut25226417@business.example.com">
+
+            <% var num=0; %>
+                <% cart.forEach((p)=>{ %>
+                    <% num++ %>
+                        <input type="hidden" name="item_name_<%= num %> " value="<%= p.title %>">
+                        <input type="hidden" name="amount_<%= num %> " value="<%= p.price %>">
+                        <input type="hidden" name="quantity_<%= num %> " value="<%= p.qty %>">
+                        <% }) %>
+                            <input type="hidden" name="currency_code" value="USD">
+                            <input type="hidden" name="amount" value="<%= total %>">
+
+                            <input type="image" src="http://www.paypal.com/en_US/i/btn/x-click-but01.gif" name="submit">
+        </form>
+
+
+
+        <!-- Set up a container element for the button -->
+        <div id="paypal-button-container"></div>
+
+        <% }else{ %>
+            <h3 class="text-center mt-3">Your cart is empty</h3>
+            <% } %>
+
+
+                <script>
+
+                    $(function () {
+                        $('a.clearCart').on('click', () => {
+                            if (!confirm('comfirm Clear cart'))
+                                return false;
+                        })
+
+
+
+                        //     $('#buynow').on('click', (e) => {
+                        //         e.preventDefault()
+                        //        $.get('/cart/buynow',()=>{
+                        //         $('form.pp input[type=image]').click()
+                        //         $('.ajaxbg').show()
+                        //        })
+                        //     })
+                    })
+
+                    const buyNowButton = document.querySelector('#buynow');
+                    buyNowButton.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        fetch('/cart/buynow').then(() => {
+                            document.querySelector('form.pp input[type=image]').click();
+                            document.querySelector('.ajaxbg').style.display = 'block';
+                        });
+                    });
+
+
+
+
+                </script>
+                <%- include ('_layouts/footer') %>
